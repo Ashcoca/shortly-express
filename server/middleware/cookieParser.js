@@ -1,14 +1,15 @@
 var _ = require('underscore');
 
-const parseCookies = (req, res) => {
-  if( _.isEmpty(req.cookie) ) {
-    res.redirect('/login');
+const parseCookies = (req, res, next) => {
+  if( !req.headers.cookie ) {
+    return false;
   }
   let cookieVal = req.headers.cookie.split('=');
   let cookieObj = {
-    hash: Number(cookieVal[1])
+    hash: cookieVal[1]
   };
-  return cookieObj;
+  req.cookie = cookieObj;
+  next();
 };
 
 module.exports = parseCookies;

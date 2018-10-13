@@ -8,7 +8,7 @@ exports.createSession = (req, res, next) => {
     .then( (promiseObj) => {
       return models.Sessions.get( {id: promiseObj.insertId})
         .then( (sessionObj) => {
-          return res.cookie('hash', sessionObj.hash, { maxAge: 3000000 } )});
+          return req.cookie('hash', sessionObj.hash, { maxAge: 3000000 } )});
   }).catch( (err) => {
     console.log('err inside of createSession: ', err);
   });
@@ -18,12 +18,25 @@ exports.createSession = (req, res, next) => {
 // Add additional authentication middleware functions below
 /************************************************************/
 
-exports.authentication = (req, res) => {
+exports.authentication = (req, res, next) => {
   let cookie = cookieParser(req, res); //obj with key/value of corresponding cookies
-  models.Sessions.get(cookie)
+  if ( !cookie ) {
+    res.redirect('/login');
+    return;
+  }
+  return models.Sessions.get(cookie)
     .then( (session) => {
-      console.log('This is the session: ', session);
+      console.log('session: ',session);
+      // res.sendStatus(200).redirect('/login'); 
+      return 200;
+    })
+    .error( (err) => {
+      console.log('err: ',err);
+      let statusCode = 403;
+      return statusCode;
     });
+
+  next();
 };    
 
 

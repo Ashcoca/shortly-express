@@ -16,6 +16,13 @@ app.use(partials());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '../public')));
+app.use(cookieParser(req, res, next));
+app.use((req, res, next) => {
+  console.log('REQUEST AFTER COOKIEPARSER\N===========', req.cookies);
+  next();
+})
+app.use(Auth.authentication(req, res, next));
+
 
 
 app.get('/signup', 
@@ -37,10 +44,16 @@ app.get('/',
 
 app.get('/create', 
   (req, res) => {
-    Auth.authentication(req, res);
-
+    Auth.authentication(req, res)
+      .then( (status) => {
+        // res.redirect('/create');
+        res.render('/create');
+      })
+      .error( (status) => {
+        res.render('/login');
+      });
   });
-
+ 
 app.get('/links', 
   (req, res, next) => {
     models.Links.getAll()
