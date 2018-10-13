@@ -6,7 +6,7 @@ const parseCookies = (req, res) => {
   }
   let cookieVal = req.headers.cookie.split('=');
   let cookieObj = {
-    id: Number(cookieVal[1])
+    hash: Number(cookieVal[1])
   };
   return cookieObj;
 };

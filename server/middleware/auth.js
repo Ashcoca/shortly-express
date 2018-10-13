@@ -4,8 +4,11 @@ const Promise = require('bluebird');
 
 
 exports.createSession = (req, res, next) => {
-  return models.Sessions.create().then( (cookie) => {
-    res.cookie('id', cookie.insertId, { maxAge: 3000000 } );
+  return models.Sessions.create()
+    .then( (promiseObj) => {
+      return models.Sessions.get( {id: promiseObj.insertId})
+        .then( (sessionObj) => {
+          return res.cookie('hash', sessionObj.hash, { maxAge: 3000000 } )});
   }).catch( (err) => {
     console.log('err inside of createSession: ', err);
   });
@@ -21,4 +24,8 @@ exports.authentication = (req, res) => {
     .then( (session) => {
       console.log('This is the session: ', session);
     });
-};
+};    
+
+
+// console.log(promiseObj.insertId);
+// res.cookie('hash', hash, { maxAge: 3000000 } );

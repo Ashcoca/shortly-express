@@ -98,8 +98,8 @@ app.post('/signup',
     var username = req.body.username;
     var password = req.body.password;
     user.create({ username, password }).then( (data) => {
-      Auth.createSession(req, res, () => {}).then( (cookie) => {
-        res.redirect('/');      
+      Auth.createSession(req, res).then( () => {
+        res.redirect('/');
       });
     }).catch( (err) => {
       console.log(err);
