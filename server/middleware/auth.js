@@ -1,17 +1,24 @@
 const models = require('../models');
+const cookieParser = require('./cookieParser');
 const Promise = require('bluebird');
-console.log('models session: ', models.Sessions);
 
-module.exports.createSession = (req, res, next) => {
+
+exports.createSession = (req, res, next) => {
   return models.Sessions.create().then( (cookie) => {
-    console.log('cookie inside of createSession: ', cookie.insertId);
-    res.cookie('sessionID', cookie.insertId, { maxAge: 300000 } );
+    res.cookie('id', cookie.insertId, { maxAge: 3000000 } );
   }).catch( (err) => {
     console.log('err inside of createSession: ', err);
   });
 };
-
+ 
 /************************************************************/
 // Add additional authentication middleware functions below
 /************************************************************/
 
+exports.authentication = (req, res) => {
+  let cookie = cookieParser(req, res); //obj with key/value of corresponding cookies
+  models.Sessions.get(cookie)
+    .then( (session) => {
+      console.log('This is the session: ', session);
+    });
+};

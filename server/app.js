@@ -4,6 +4,7 @@ const utils = require('./lib/hashUtils');
 const partials = require('express-partials');
 const bodyParser = require('body-parser');
 const Auth = require('./middleware/auth');
+const cookieParser = require('./middleware/cookieParser');
 const models = require('./models');
 const user = require('./models/user');
 
@@ -27,6 +28,8 @@ app.get('/login',
     res.render('login');
   });
 
+//all of the following need to check the session before the move through with their requests
+
 app.get('/', 
   (req, res) => {
     res.render('index');
@@ -34,7 +37,8 @@ app.get('/',
 
 app.get('/create', 
   (req, res) => {
-    res.render('index');
+    Auth.authentication(req, res);
+
   });
 
 app.get('/links', 
@@ -50,8 +54,7 @@ app.get('/links',
 
 app.post('/links', 
   (req, res, next) => {
-    console.log('request body: ', req.body);
-    console.log('request cookies: ', req.cookies);
+
     var url = req.body.url;
     if (!models.Links.isValidUrl(url)) {
       // send back a 404 if link is not valid
